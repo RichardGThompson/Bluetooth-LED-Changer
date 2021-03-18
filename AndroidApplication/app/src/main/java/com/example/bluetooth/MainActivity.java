@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -234,11 +235,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         int redVal = redSB.getProgress();
         int greenVal = greenSB.getProgress();
         int blueVal = blueSB.getProgress();
-        Log.d(TAG, "onClick: BlueVal:" +blueVal);
 
-        // NOTE: For some reason the LEDs use GRB so be mindful of that.
-        byte[] msg = ("<" + greenVal + "," + redVal + "," + blueVal + ">").getBytes(Charset.defaultCharset());
-        mBluetoothConnection.write(msg);
+        // Make sure that there is actually a connection before sending the data
+        if(mBluetoothConnection != null){
+            //Send the data to the Arduino encoded as a string with start markers of < and end markers of > delimited by commas.
+            byte[] msg = ("<" + greenVal + "," + redVal + "," + blueVal + ">").getBytes(Charset.defaultCharset());
+            mBluetoothConnection.write(msg);
+        }
+        //If there is not an active connection then give the user a Toast message.
+        else{
+            Toast.makeText(this, "No device connected!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public boolean activeConnection(){
